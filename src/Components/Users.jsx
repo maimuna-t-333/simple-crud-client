@@ -1,4 +1,5 @@
 import React, { use, useState } from 'react';
+import { Link } from 'react-router';
 
 const Users = ({ usersPromise }) => {
     const initialUsers = use(usersPromise)
@@ -32,12 +33,28 @@ const Users = ({ usersPromise }) => {
                 }
             })
     }
+    const handleDeleteUser=(id)=>{
+        console.log('delete user',id)
+        fetch(`http://localhost:3000/users/${id}`,{
+            method:'DELETE'
+        })
+        .then(res=>res.json())
+        .then(data=>{
+            if(data.deletedCount){
+                const remainingUsers=users.filter(user=>user._id!==id);
+                setUsers(remainingUsers)
+                console.log('after delete',data)
+            }
+            
+        })
+    }
     return (
         <div>
             <div>
                 {/* add user  */}
             </div>
             <div>
+                <div>users:{users.length}</div>
                 <form onSubmit={handleAddSubmit} action="">
                     <input type="text" name='name' />
                     <br />
@@ -49,7 +66,10 @@ const Users = ({ usersPromise }) => {
             {/* view user  */}
             <div>
                 {
-                    users.map(user=><p key={user._id}>{user.name}: {user.email}</p>)
+                    users.map(user=><p key={user._id}>{user.name}: {user.email}
+                    <Link to={`/users/${user._id}`}>Details</Link>
+                    <Link to={`/update/${user._id}`}>Edit</Link>
+                    <button onClick={()=>handleDeleteUser(user._id)}>X</button></p>)
                 }
             </div>
         </div>
